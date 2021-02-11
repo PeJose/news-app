@@ -12,6 +12,9 @@
           @click="changeCategory(category)"
           >{{ category.name }}</v-btn
         >
+        <v-btn block class="mt-10" color="red" @click="changeCategory(null)"
+          >RESET CATEGORY</v-btn
+        >
       </v-col>
     </v-row>
   </v-card>
@@ -19,6 +22,7 @@
 
 <script>
 export default {
+  props: ["target"],
   computed: {
     Categories() {
       return this.$store.getters.Categories;
@@ -26,8 +30,7 @@ export default {
   },
   methods: {
     async changeCategory(category) {
-      this.$store.commit("change_category", category);
-      await this.$store.dispatch("getArticles");
+      await this.$store.dispatch(this.target, category);
     },
   },
 };

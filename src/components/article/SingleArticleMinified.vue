@@ -22,7 +22,11 @@
       <v-spacer />
       <a
         @click="
-          saveToWatchlist({ title: article.webTitle, url: article.apiUrl })
+          saveToWatchlist({
+            title: article.webTitle,
+            url: article.apiUrl,
+            category: article.sectionId,
+          })
         "
         ><v-icon class="pb-1">mdi-plus</v-icon>Add to watchlist</a
       >
@@ -41,26 +45,17 @@ export default {
   },
   computed: {
     articleText() {
-      let articleWholeText = this.article.blocks.body
-        .slice(0)
-        .reverse()
-        .map((item) => {
-          return item.bodyTextSummary;
-        })
-        .join("");
-      return articleWholeText.substring(0, 500).trim();
+      return this.article.fields.bodyText.substring(0, 500).trim();
     },
     articleDate() {
       const date = new Date(this.article.webPublicationDate);
       const year = date.getFullYear();
       const month = ("0" + (date.getMonth() + 1)).substr(-2);
-      const day = date.getDate();
+      const day = ("0" + date.getDate()).substr(-2);
       const time =
-        date.getHours() +
+        ("0" + date.getHours()).substr(-2) +
         ":" +
-        date.getMinutes() +
-        ":" +
-        ("0" + date.getSeconds()).substr(-2);
+        ("0" + date.getMinutes()).substr(-2);
       return year + "/" + month + "/" + day + " " + time;
     },
   },

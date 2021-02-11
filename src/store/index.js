@@ -8,6 +8,7 @@ const state = {
   WATCHLIST_NAME: "news_watchlist",
   currentArticle: {},
   currentCategory: null,
+  watchlistCategory: null,
   articles: [],
   watchlist: [],
   categories: [
@@ -19,6 +20,7 @@ const state = {
     { id: "money", name: "Money", color: "yellow darken-2" },
   ],
   page: 1,
+  pages: 1,
 };
 const getters = {
   Articles: (state) => {
@@ -33,8 +35,17 @@ const getters = {
   CurrentCategory: (state) => {
     return state.currentCategory;
   },
+  WatchlistCategory: (state) => {
+    return state.watchlistCategory;
+  },
   Watchlist: (state) => {
     return state.watchlist;
+  },
+  CurrentPage: (state) => {
+    return state.page;
+  },
+  Pages: (state) => {
+    return state.pages;
   },
 };
 const mutations = {
@@ -47,14 +58,20 @@ const mutations = {
   change_page(state, page) {
     state.page = page;
   },
+  change_pages(state, pages) {
+    state.pages = pages;
+  },
   change_category(state, category) {
     state.currentCategory = category;
+  },
+  change_watchlist_category(state, category) {
+    state.watchlistCategory = category;
   },
 };
 const actions = {
   async getArticles({ commit }) {
     let url =
-      "https://content.guardianapis.com/search?api-key=test&show-fields=bodyText,thumbnail&show-blocks=all&page=" +
+      "https://content.guardianapis.com/search?api-key=test&from-date=2021-01-01&show-fields=bodyText,thumbnail&page=" +
       state.page;
     if (state.currentCategory !== null) {
       url += "&section=" + state.currentCategory.id;
@@ -63,7 +80,7 @@ const actions = {
       .get(url)
       .then((result) => {
         commit("save_articles", result.data.response.results);
-        commit("change_page", result.data.response.currentPage);
+        commit("change_pages", result.data.response.pages - 1);
       })
       .catch((error) => console.log(error));
   },
@@ -77,20 +94,42 @@ const actions = {
       })
       .catch((error) => console.log(error));
   },
-  saveToWatchlist({ state, dispatch }, permalink) {
+  async changeCategory({ commit, dispatch }, category) {
+    commit("change_page", 1);
+    commit("change_category", category);
+    await dispatch("getArticles");
+  },
+  changeWatchlistCategory({ commit, dispatch }, category) {
+    commit("change_watchlist_category", category);
     dispatch("getWatchlist");
-    state.watchlist.push(permalink);
-    localStorage[state.WATCHLIST_NAME] = JSON.stringify(state.watchlist);
+  },
+  saveToWatchlist({ state, dispatch }, article) {
+    dispatch("getWatchlist");
+    if (state.watchlist.findIndex((item) => item.url === article.url) === -1) {
+      state.watchlist.push(article);
+      localStorage[state.WATCHLIST_NAME] = JSON.stringify(state.watchlist);
+    }
   },
   deleteFromWatchlist({ state, dispatch }, id) {
+    let watchlist = [];
+    if (localStorage.getItem(state.WATCHLIST_NAME) !== null) {
+      watchlist = JSON.parse(localStorage.getItem(state.WATCHLIST_NAME));
+    }
+    watchlist.splice(id, 1);
+    localStorage[state.WATCHLIST_NAME] = JSON.stringify(watchlist);
     dispatch("getWatchlist");
-    state.watchlist.splice(id, 1);
-    localStorage[state.WATCHLIST_NAME] = JSON.stringify(state.watchlist);
   },
   getWatchlist({ state }) {
+    let watchlist = [];
     if (localStorage.getItem(state.WATCHLIST_NAME) !== null) {
-      state.watchlist = JSON.parse(localStorage.getItem(state.WATCHLIST_NAME));
+      watchlist = JSON.parse(localStorage.getItem(state.WATCHLIST_NAME));
     }
+    if (state.watchlistCategory !== null) {
+      watchlist = watchlist.filter(
+        (item) => item.category === state.watchlistCategory.id
+      );
+    }
+    state.watchlist = watchlist;
   },
 };
 

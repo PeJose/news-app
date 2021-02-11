@@ -16,8 +16,15 @@
           :key="index"
           :article="article"
         ></single-article-minified>
+        <v-pagination
+          v-model="page"
+          class="my-4"
+          :length="Pages"
+          :total-visible="7"
+          @input="changePage"
+        ></v-pagination>
       </v-col>
-      <v-col cols="3"><categories-list></categories-list> </v-col>
+      <v-col cols="3"><categories-list :target="'changeCategory'"></categories-list> </v-col>
     </v-row>
   </v-container>
 </template>
@@ -27,6 +34,11 @@ import SingleArticleMinified from "@/components/article/SingleArticleMinified.vu
 import CategoriesList from "@/components/categories/CategoriesList.vue";
 export default {
   components: { SingleArticleMinified, CategoriesList },
+  data() {
+    return {
+      page: 1,
+    };
+  },
   async created() {
     await this.$store.dispatch("getArticles");
   },
@@ -36,6 +48,23 @@ export default {
     },
     CurrentCategory() {
       return this.$store.getters.CurrentCategory;
+    },
+    CurrentPage() {
+      return this.$store.getters.CurrentPage;
+    },
+    Pages() {
+      return this.$store.getters.Pages;
+    },
+  },
+  watch: {
+    Page() {
+      this.page = this.$store.getters.Page;
+    },
+  },
+  methods: {
+    async changePage(event) {
+      this.$store.commit("change_page", event);
+      await this.$store.dispatch("getArticles");
     },
   },
 };
