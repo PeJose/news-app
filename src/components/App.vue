@@ -34,11 +34,6 @@
 <script>
 export default {
   name: "App",
-
-  components: {},
-  data() {
-    return {};
-  },
   computed: {
     theme() {
       return this.$vuetify.theme.dark ? "dark" : "light";

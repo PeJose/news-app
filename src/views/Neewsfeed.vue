@@ -24,7 +24,10 @@
           @input="changePage"
         ></v-pagination>
       </v-col>
-      <v-col cols="3"><categories-list :target="'changeCategory'"></categories-list> </v-col>
+      <v-col cols="3"
+        ><categories-list :target="'changeCategory'"></categories-list
+        ><filters-list></filters-list>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -32,15 +35,14 @@
 <script>
 import SingleArticleMinified from "@/components/article/SingleArticleMinified.vue";
 import CategoriesList from "@/components/categories/CategoriesList.vue";
+import FiltersList from "../components/filters/FiltersList.vue";
 export default {
-  components: { SingleArticleMinified, CategoriesList },
+  name: "Neewsfeed",
+  components: { SingleArticleMinified, CategoriesList, FiltersList },
   data() {
     return {
       page: 1,
     };
-  },
-  async created() {
-    await this.$store.dispatch("getArticles");
   },
   computed: {
     Articles() {
@@ -60,6 +62,9 @@ export default {
     Page() {
       this.page = this.$store.getters.Page;
     },
+  },
+  async created() {
+    await this.$store.dispatch("getArticles");
   },
   methods: {
     async changePage(event) {

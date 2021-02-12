@@ -1,5 +1,5 @@
 <template>
-  <v-card tile elevation="2" class="px-5 py-5">
+  <v-card tile elevation="2" class="px-5 py-5 mb-6">
     <v-card-title class="text-h5">Categories List</v-card-title>
     <v-row>
       <v-col>

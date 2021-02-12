@@ -22,6 +22,8 @@
             saveToWatchlist({
               title: CurrentArticle.webTitle,
               url: CurrentArticle.apiUrl,
+              category: CurrentArticle.sectionId,
+              thumbnail: CurrentArticle.fields.thumbnail,
             })
           "
           ><v-icon class="pb-1">mdi-plus</v-icon>Add to watchlist</a
@@ -34,34 +36,38 @@
 <script>
 export default {
   name: "Article",
-  async created() {
-    await this.$store.dispatch("getArticle", this.$route.query.url);
-  },
   computed: {
     CurrentArticle() {
       return this.$store.getters.CurrentArticle;
     },
     articleHtml() {
-      return this.CurrentArticle.blocks.body
-        .slice(0)
-        .reverse()
-        .map((item) => {
-          return item.bodyHtml;
-        })
-        .join("");
+      if (typeof this.CurrentArticle.blocks !== "undefined") {
+        return this.CurrentArticle.blocks.body
+          .slice(0)
+          .reverse()
+          .map((item) => {
+            return item.bodyHtml;
+          })
+          .join("");
+      } else {
+        return '';
+      }
     },
     articleDate() {
       const date = new Date(this.CurrentArticle.webPublicationDate);
-      const year = date.getFullYear();
-      const month = ("0" + (date.getMonth() + 1)).substr(-2);
-      const day = ("0" + date.getDate()).substr(-2);
+      const year = date.getUTCFullYear();
+      const month = ("0" + (date.getUTCMonth() + 1)).substr(-2);
+      const day = ("0" + date.getUTCDate()).substr(-2);
       const time =
-        ("0" + date.getHours()).substr(-2) +
+        ("0" + date.getUTCHours()).substr(-2) +
         ":" +
-        ("0" + date.getMinutes()).substr(-2);
-      ":" + ("0" + date.getSeconds()).substr(-2);
+        ("0" + date.getUTCMinutes()).substr(-2);
+      ":" + ("0" + date.getUTCSeconds()).substr(-2);
       return year + "/" + month + "/" + day + " " + time;
     },
+  },
+  async created() {
+    await this.$store.dispatch("getArticle", this.$route.query.url);
   },
   methods: {
     saveToWatchlist(article) {

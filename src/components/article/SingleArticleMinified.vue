@@ -2,7 +2,7 @@
   <v-card
     tile
     :elevation="elevation"
-    class=" mb-10 px-10 py-5"
+    class=" mb-6 px-10 py-5"
     @mouseover="elevation = 10"
     @mouseleave="elevation = 2"
   >
@@ -26,6 +26,7 @@
             title: article.webTitle,
             url: article.apiUrl,
             category: article.sectionId,
+            thumbnail: article.fields.thumbnail,
           })
         "
         ><v-icon class="pb-1">mdi-plus</v-icon>Add to watchlist</a
@@ -49,13 +50,13 @@ export default {
     },
     articleDate() {
       const date = new Date(this.article.webPublicationDate);
-      const year = date.getFullYear();
-      const month = ("0" + (date.getMonth() + 1)).substr(-2);
-      const day = ("0" + date.getDate()).substr(-2);
+      const year = date.getUTCFullYear();
+      const month = ("0" + (date.getUTCMonth() + 1)).substr(-2);
+      const day = ("0" + date.getUTCDate()).substr(-2);
       const time =
-        ("0" + date.getHours()).substr(-2) +
+        ("0" + date.getUTCHours()).substr(-2) +
         ":" +
-        ("0" + date.getMinutes()).substr(-2);
+        ("0" + date.getUTCMinutes()).substr(-2);
       return year + "/" + month + "/" + day + " " + time;
     },
   },
@@ -75,3 +76,4 @@ export default {
 </script>
 
 <style></style>
+git commit -m "E-III: Added filters, night mode, sections in watchlist, miniatures in watchlist"
